@@ -1,0 +1,49 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const NAV = [
+  { href: "/admin",          label: "Dashboard" },
+  { href: "/admin/products", label: "Products"  },
+];
+
+export default function Sidebar() {
+  const pathname = usePathname();
+
+  return (
+    <aside className="flex w-52 shrink-0 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="flex flex-1 flex-col gap-1 p-3">
+        <p className="mb-2 px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+          Admin
+        </p>
+
+        {NAV.map(({ href, label }) => {
+          const active = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                active
+                  ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
+                  : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+              }`}
+            >
+              {label}
+            </Link>
+          );
+        })}
+      </div>
+
+      <div className="border-t border-zinc-100 p-3 dark:border-zinc-800">
+        <Link
+          href="/"
+          className="block rounded-lg px-3 py-2 text-xs text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-white"
+        >
+          ← View Store
+        </Link>
+      </div>
+    </aside>
+  );
+}
