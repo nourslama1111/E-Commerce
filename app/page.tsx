@@ -1,8 +1,8 @@
-import { getFeaturedProducts } from "@/lib/data";
+import { getFeaturedProducts } from "@/lib/products";
 import ProductGrid from "@/components/ProductGrid";
 
-export default function HomePage() {
-  const featured = getFeaturedProducts(3);
+export default async function HomePage() {
+  const featured = await getFeaturedProducts(3);
 
   return (
     <main className="flex-1">
@@ -24,7 +24,10 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex items-baseline justify-between">
           <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white">Featured</h2>
-          <a href="/products" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+          <a
+            href="/products"
+            className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-white"
+          >
             View all →
           </a>
         </div>

@@ -1,15 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getProductById, products } from "@/lib/data";
+import { getProductById } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import AddToCartButton from "@/components/AddToCartButton";
 
 interface Props {
   params: Promise<{ id: string }>;
-}
-
-export function generateStaticParams() {
-  return products.map((p) => ({ id: p.id }));
 }
 
 const CATEGORY_BG: Record<string, string> = {
@@ -40,7 +36,7 @@ function StarRating({ rating }: { rating: number }) {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = await params;
-  const product = getProductById(id);
+  const product = await getProductById(id);
 
   if (!product) notFound();
 
