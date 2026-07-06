@@ -4,8 +4,8 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 const OPTIONS = [
   { value: "newest",     label: "Newest" },
-  { value: "price_asc",  label: "Price: Low to High" },
-  { value: "price_desc", label: "Price: High to Low" },
+  { value: "price_asc",  label: "Price ↑" },
+  { value: "price_desc", label: "Price ↓" },
 ] as const;
 
 export default function SortSelect() {
@@ -24,7 +24,7 @@ export default function SortSelect() {
     <select
       value={searchParams.get("sort") ?? "newest"}
       onChange={handleChange}
-      className="shrink-0 cursor-pointer rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+      className="w-28 shrink-0 cursor-pointer rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
     >
       {OPTIONS.map((o) => (
         <option key={o.value} value={o.value}>

@@ -7,13 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String    @default("")
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
 model Product {
   id          String   @id @default(cuid())
   name        String
   description String
   price       Float
   image       String   @default("")
-  category    String
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
   inStock     Boolean  @default(true)
   rating      Float    @default(0)
   reviewCount Int      @default(0)

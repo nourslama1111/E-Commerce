@@ -19,9 +19,10 @@ export async function PATCH(
         description: body.description?.trim(),
         price:       body.price ? Number(body.price) : undefined,
         image:       body.image?.trim(),
-        category:    body.category,
+        categoryId:  body.categoryId,
         inStock:     body.inStock,
       },
+      include: { category: true },
     });
 
     return NextResponse.json(product);

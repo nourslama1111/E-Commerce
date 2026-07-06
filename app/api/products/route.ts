@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const category = searchParams.get("category") ?? undefined;
 
   try {
-    const products = await getProducts(category);
+    const products = await getProducts({ category });
     return NextResponse.json(products);
   } catch {
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });

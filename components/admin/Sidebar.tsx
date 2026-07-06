@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
-  { href: "/admin",          label: "Dashboard" },
-  { href: "/admin/products", label: "Products"  },
+  { href: "/admin",             label: "Dashboard"  },
+  { href: "/admin/products",    label: "Products"   },
+  { href: "/admin/categories",  label: "Categories" },
 ];
 
 export default function Sidebar() {

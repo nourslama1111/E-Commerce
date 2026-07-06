@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
     if (!body.name?.trim())        return NextResponse.json({ error: "Name is required" }, { status: 400 });
     if (!body.description?.trim()) return NextResponse.json({ error: "Description is required" }, { status: 400 });
-    if (!body.category)            return NextResponse.json({ error: "Category is required" }, { status: 400 });
+    if (!body.categoryId)          return NextResponse.json({ error: "Category is required" }, { status: 400 });
     if (!body.price || Number(body.price) <= 0)
       return NextResponse.json({ error: "Price must be greater than 0" }, { status: 400 });
 
@@ -17,9 +17,10 @@ export async function POST(request: Request) {
         description: body.description.trim(),
         price:       Number(body.price),
         image:       body.image?.trim() ?? "",
-        category:    body.category,
+        categoryId:  body.categoryId,
         inStock:     Boolean(body.inStock),
       },
+      include: { category: true },
     });
 
     return NextResponse.json(product, { status: 201 });

@@ -1,7 +1,13 @@
 import Link from "next/link";
+import { prisma } from "@/lib/db";
 import ProductForm from "@/components/admin/ProductForm";
 
-export default function NewProductPage() {
+export default async function NewProductPage() {
+  const categories = await prisma.category.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+
   return (
     <div>
       <nav className="mb-6 flex items-center gap-2 text-sm text-zinc-500">
@@ -16,7 +22,7 @@ export default function NewProductPage() {
       <p className="mt-1 text-sm text-zinc-500">Fill in the details to add a product to your store.</p>
 
       <div className="mt-8">
-        <ProductForm />
+        <ProductForm categories={categories} />
       </div>
     </div>
   );

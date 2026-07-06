@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { categories } from "@/lib/data";
 import type { Product } from "@/models/types";
 
 // ─── Reusable field wrapper ───────────────────────────────────────────────────
@@ -45,7 +44,7 @@ interface FormState {
   description: string;
   price: string;
   image: string;
-  category: string;
+  categoryId: string;
   inStock: boolean;
 }
 
@@ -53,14 +52,15 @@ interface FormErrors {
   name?: string;
   description?: string;
   price?: string;
-  category?: string;
+  categoryId?: string;
 }
 
 interface Props {
   product?: Product;
+  categories: { id: string; name: string }[];
 }
 
-export default function ProductForm({ product }: Props) {
+export default function ProductForm({ product, categories }: Props) {
   const router = useRouter();
   const isEdit = Boolean(product);
 
@@ -69,7 +69,7 @@ export default function ProductForm({ product }: Props) {
     description: product?.description ?? "",
     price:       product?.price       ? String(product.price) : "",
     image:       product?.image       ?? "",
-    category:    product?.category    ?? "",
+    categoryId:  product?.categoryId  ?? "",
     inStock:     product?.inStock     ?? true,
   });
 
@@ -99,8 +99,8 @@ export default function ProductForm({ product }: Props) {
       e.description = "Description must be at least 10 characters";
     if (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0)
       e.price = "Price must be a number greater than 0";
-    if (!form.category)
-      e.category = "Category is required";
+    if (!form.categoryId)
+      e.categoryId = "Category is required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -150,16 +150,16 @@ export default function ProductForm({ product }: Props) {
           />
         </Field>
 
-        <Field label="Category" error={errors.category} required>
+        <Field label="Category" error={errors.categoryId} required>
           <select
-            value={form.category}
-            onChange={set("category")}
-            className={inputClass(!!errors.category)}
+            value={form.categoryId}
+            onChange={set("categoryId")}
+            className={inputClass(!!errors.categoryId)}
           >
             <option value="">Select a category</option>
             {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
               </option>
             ))}
           </select>

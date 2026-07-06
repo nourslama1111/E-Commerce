@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { prisma } from "@/lib/db";
 import { getProductById } from "@/lib/products";
 import ProductForm from "@/components/admin/ProductForm";
 
@@ -9,7 +10,14 @@ interface Props {
 
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
-  const product = await getProductById(id);
+
+  const [product, categories] = await Promise.all([
+    getProductById(id),
+    prisma.category.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   if (!product) notFound();
 
@@ -27,7 +35,7 @@ export default async function EditProductPage({ params }: Props) {
       <p className="mt-1 text-sm text-zinc-500">Update the product details below.</p>
 
       <div className="mt-8">
-        <ProductForm product={product} />
+        <ProductForm product={product} categories={categories} />
       </div>
     </div>
   );

@@ -3,14 +3,20 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function DeleteButton({ id }: { id: string }) {
+export default function DeleteButton({
+  id,
+  endpoint = "/api/admin/products",
+}: {
+  id: string;
+  endpoint?: string;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm("Delete this product? This cannot be undone.")) return;
+    if (!confirm("Delete this? This cannot be undone.")) return;
     setLoading(true);
-    await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
+    await fetch(`${endpoint}/${id}`, { method: "DELETE" });
     router.refresh();
   };
 

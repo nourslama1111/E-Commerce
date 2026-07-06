@@ -1,11 +1,11 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { getProducts } from "@/lib/products";
-import { categories } from "@/lib/data";
+import { prisma } from "@/lib/db";
 import ProductGrid from "@/components/ProductGrid";
 import SearchInput from "@/components/SearchInput";
 import SortSelect from "@/components/SortSelect";
 import Pagination from "@/components/Pagination";
+import Link from "next/link";
 
 interface Props {
   searchParams: Promise<{
@@ -20,19 +20,16 @@ export default async function ProductsPage({ searchParams }: Props) {
   const { category, search, sort, page } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
 
-  const { products, total, totalPages } = await getProducts({
-    category,
-    search,
-    sort,
-    page: currentPage,
-  });
+  const [{ products, total, totalPages }, categories] = await Promise.all([
+    getProducts({ category, search, sort, page: currentPage }),
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+  ]);
 
-  // Category links preserve search + sort but reset page
-  const buildCategoryUrl = (cat?: string) => {
+  const buildCategoryUrl = (slug?: string) => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (sort)   params.set("sort", sort);
-    if (cat)    params.set("category", cat);
+    if (slug)   params.set("category", slug);
     const qs = params.toString();
     return `/products${qs ? `?${qs}` : ""}`;
   };
@@ -46,17 +43,17 @@ export default async function ProductsPage({ searchParams }: Props) {
       </div>
 
       {/* Search + Sort */}
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 grid grid-cols-[1fr_auto] gap-3">
         <Suspense
           fallback={
-            <div className="h-10 flex-1 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+            <div className="h-10 w-full animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
           }
         >
           <SearchInput />
         </Suspense>
         <Suspense
           fallback={
-            <div className="h-10 w-44 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+            <div className="h-10 w-28 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
           }
         >
           <SortSelect />
@@ -77,15 +74,15 @@ export default async function ProductsPage({ searchParams }: Props) {
         </Link>
         {categories.map((cat) => (
           <Link
-            key={cat}
-            href={buildCategoryUrl(cat)}
+            key={cat.id}
+            href={buildCategoryUrl(cat.slug)}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              category === cat
+              category === cat.slug
                 ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
                 : "border border-zinc-200 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400"
             }`}
           >
-            {cat}
+            {cat.name}
           </Link>
         ))}
       </div>

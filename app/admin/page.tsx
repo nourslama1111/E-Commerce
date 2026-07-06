@@ -2,18 +2,18 @@ import { prisma } from "@/lib/db";
 import StatCard from "@/components/admin/StatCard";
 
 export default async function AdminDashboard() {
-  const [total, inStock, outOfStock, grouped] = await Promise.all([
+  const [total, inStock, outOfStock, categoryCount] = await Promise.all([
     prisma.product.count(),
     prisma.product.count({ where: { inStock: true } }),
     prisma.product.count({ where: { inStock: false } }),
-    prisma.product.groupBy({ by: ["category"] }),
+    prisma.category.count(),
   ]);
 
   const stats = [
-    { label: "Total Products",  value: total },
-    { label: "In Stock",        value: inStock },
-    { label: "Out of Stock",    value: outOfStock },
-    { label: "Categories",      value: grouped.length },
+    { label: "Total Products", value: total },
+    { label: "In Stock",       value: inStock },
+    { label: "Out of Stock",   value: outOfStock },
+    { label: "Categories",     value: categoryCount },
   ];
 
   return (

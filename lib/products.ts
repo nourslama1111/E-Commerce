@@ -2,7 +2,7 @@ import { prisma } from "./db";
 import type { Product } from "@/models/types";
 
 export interface ProductQuery {
-  category?: string;
+  category?: string; // category slug
   search?: string;
   sort?: string;
   page?: number;
@@ -16,24 +16,33 @@ export interface ProductsResult {
 
 const PER_PAGE = 9;
 
-function serialize(doc: {
+type PrismaProductWithCategory = {
   id: string;
   name: string;
   description: string;
   price: number;
   image: string;
-  category: string;
+  categoryId: string;
+  category: { id: string; name: string; slug: string; description: string };
   inStock: boolean;
   rating: number;
   reviewCount: number;
-}): Product {
+};
+
+function serialize(doc: PrismaProductWithCategory): Product {
   return {
     id: doc.id,
     name: doc.name,
     description: doc.description,
     price: doc.price,
     image: doc.image,
-    category: doc.category,
+    categoryId: doc.categoryId,
+    category: {
+      id: doc.category.id,
+      name: doc.category.name,
+      slug: doc.category.slug,
+      description: doc.category.description,
+    },
     inStock: doc.inStock,
     rating: doc.rating,
     reviewCount: doc.reviewCount,
@@ -44,7 +53,7 @@ export async function getProducts(query: ProductQuery = {}): Promise<ProductsRes
   const { category, search, sort = "newest", page = 1 } = query;
 
   const where = {
-    ...(category ? { category } : {}),
+    ...(category ? { category: { slug: category } } : {}),
     ...(search
       ? { name: { contains: search, mode: "insensitive" as const } }
       : {}),
@@ -60,7 +69,13 @@ export async function getProducts(query: ProductQuery = {}): Promise<ProductsRes
   const skip = (page - 1) * PER_PAGE;
 
   const [docs, total] = await prisma.$transaction([
-    prisma.product.findMany({ where, orderBy, skip, take: PER_PAGE }),
+    prisma.product.findMany({
+      where,
+      orderBy,
+      skip,
+      take: PER_PAGE,
+      include: { category: true },
+    }),
     prisma.product.count({ where }),
   ]);
 
@@ -72,7 +87,10 @@ export async function getProducts(query: ProductQuery = {}): Promise<ProductsRes
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-  const doc = await prisma.product.findUnique({ where: { id } });
+  const doc = await prisma.product.findUnique({
+    where: { id },
+    include: { category: true },
+  });
   return doc ? serialize(doc) : null;
 }
 
@@ -81,6 +99,7 @@ export async function getFeaturedProducts(count = 3): Promise<Product[]> {
     where: { inStock: true },
     take: count,
     orderBy: { createdAt: "desc" },
+    include: { category: true },
   });
   return docs.map(serialize);
 }

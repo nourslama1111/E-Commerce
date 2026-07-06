@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getProductById } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import AddToCartButton from "@/components/AddToCartButton";
@@ -40,7 +41,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   if (!product) notFound();
 
-  const imageBg = CATEGORY_BG[product.category] ?? "bg-zinc-100 dark:bg-zinc-800";
+  const imageBg = CATEGORY_BG[product.category.name] ?? "bg-zinc-100 dark:bg-zinc-800";
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -54,13 +55,26 @@ export default async function ProductDetailPage({ params }: Props) {
       </nav>
 
       <div className="grid gap-12 lg:grid-cols-2">
-        {/* Image placeholder */}
-        <div className={`h-96 rounded-3xl lg:h-[520px] ${imageBg}`} />
+        {/* Image */}
+        {product.image ? (
+          <div className="relative h-96 overflow-hidden rounded-3xl lg:h-[520px]">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+              preload
+            />
+          </div>
+        ) : (
+          <div className={`h-96 rounded-3xl lg:h-[520px] ${imageBg}`} />
+        )}
 
         {/* Product info */}
         <div className="flex flex-col justify-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
-            {product.category}
+            {product.category.name}
           </p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
             {product.name}

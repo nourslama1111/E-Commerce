@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/models/types";
 import AddToCartButton from "./AddToCartButton";
@@ -15,17 +16,29 @@ interface Props {
 }
 
 export default function ProductCard({ product }: Props) {
-  const imageBg = CATEGORY_BG[product.category] ?? "bg-zinc-100 dark:bg-zinc-800";
+  const imageBg = CATEGORY_BG[product.category.name] ?? "bg-zinc-100 dark:bg-zinc-800";
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
       <Link href={`/product/${product.id}`} className="block shrink-0">
-        <div className={`h-52 w-full transition-opacity group-hover:opacity-80 ${imageBg}`} />
+        {product.image ? (
+          <div className="relative h-52 w-full overflow-hidden">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-opacity group-hover:opacity-80"
+            />
+          </div>
+        ) : (
+          <div className={`h-52 w-full transition-opacity group-hover:opacity-80 ${imageBg}`} />
+        )}
       </Link>
 
       <div className="flex flex-1 flex-col p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
-          {product.category}
+          {product.category.name}
         </p>
         <Link href={`/product/${product.id}`}>
           <h3 className="mt-1 text-base font-semibold text-zinc-900 hover:underline dark:text-white">

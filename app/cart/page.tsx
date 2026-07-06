@@ -56,7 +56,7 @@ export default function CartPage() {
         {/* Item list */}
         <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {items.map((item) => {
-            const imageBg = CATEGORY_BG[item.category] ?? "bg-zinc-100 dark:bg-zinc-800";
+            const imageBg = CATEGORY_BG[item.category.name] ?? "bg-zinc-100 dark:bg-zinc-800";
             return (
               <div key={item.id} className="flex gap-5 py-6">
                 <Link href={`/product/${item.id}`} className="shrink-0">
@@ -67,7 +67,7 @@ export default function CartPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
-                        {item.category}
+                        {item.category.name}
                       </p>
                       <Link href={`/product/${item.id}`}>
                         <h3 className="font-semibold text-zinc-900 hover:underline dark:text-white">
