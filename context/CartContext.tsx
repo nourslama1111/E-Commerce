@@ -6,7 +6,8 @@ import type { Product, CartItem } from "@/models/types";
 type CartAction =
   | { type: "ADD_ITEM"; product: Product }
   | { type: "REMOVE_ITEM"; id: string }
-  | { type: "UPDATE_QUANTITY"; id: string; quantity: number };
+  | { type: "UPDATE_QUANTITY"; id: string; quantity: number }
+  | { type: "CLEAR_CART" };
 
 function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
   switch (action.type) {
@@ -26,6 +27,8 @@ function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
       return state.map((i) =>
         i.id === action.id ? { ...i, quantity: action.quantity } : i
       );
+    case "CLEAR_CART":
+      return [];
     default:
       return state;
   }
@@ -36,6 +39,7 @@ interface CartContextValue {
   addItem: (product: Product) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
   totalItems: number;
   totalPrice: number;
 }
@@ -49,13 +53,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeItem = (id: string) => dispatch({ type: "REMOVE_ITEM", id });
   const updateQuantity = (id: string, quantity: number) =>
     dispatch({ type: "UPDATE_QUANTITY", id, quantity });
+  const clearCart = () => dispatch({ type: "CLEAR_CART" });
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
   const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, totalItems, totalPrice }}
+      value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice }}
     >
       {children}
     </CartContext.Provider>

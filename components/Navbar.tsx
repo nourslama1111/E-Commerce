@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CartIcon from "./CartIcon";
+import AuthNav from "./AuthNav";
 
 export default function Navbar() {
   return (
@@ -23,9 +24,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-5">
           <CartIcon />
-          <button className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200">
-            Sign in
-          </button>
+          <AuthNav />
         </div>
       </div>
     </header>

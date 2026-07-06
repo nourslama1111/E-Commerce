@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 
 const NAV = [
   { href: "/admin",             label: "Dashboard"  },
@@ -11,6 +12,7 @@ const NAV = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <aside className="flex w-52 shrink-0 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
@@ -38,6 +40,18 @@ export default function Sidebar() {
       </div>
 
       <div className="border-t border-zinc-100 p-3 dark:border-zinc-800">
+        {session?.user?.email && (
+          <p className="truncate px-3 pb-1 text-xs text-zinc-400" title={session.user.email}>
+            {session.user.email}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="w-full rounded-lg px-3 py-2 text-left text-xs text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-white"
+        >
+          Sign out
+        </button>
         <Link
           href="/"
           className="block rounded-lg px-3 py-2 text-xs text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-white"

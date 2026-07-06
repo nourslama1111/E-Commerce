@@ -149,12 +149,12 @@ export default function CartPage() {
               </div>
             </dl>
 
-            <button
-              disabled
-              className="mt-6 w-full cursor-not-allowed rounded-full bg-zinc-900 py-3 text-sm font-semibold text-white opacity-50 dark:bg-white dark:text-zinc-900"
+            <Link
+              href="/checkout"
+              className="mt-6 block w-full rounded-full bg-zinc-900 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Checkout — coming soon
-            </button>
+              Proceed to checkout
+            </Link>
 
             <Link
               href="/products"

@@ -18,16 +18,130 @@ model Category {
 }
 
 model Product {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
   description String
   price       Float
-  image       String   @default("")
-  category    Category @relation(fields: [categoryId], references: [id])
+  image       String      @default("")
+  category    Category    @relation(fields: [categoryId], references: [id])
   categoryId  String
-  inStock     Boolean  @default(true)
-  rating      Float    @default(0)
-  reviewCount Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  inStock     Boolean     @default(true)
+  rating      Float       @default(0)
+  reviewCount Int         @default(0)
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// ─── Auth.js (NextAuth) models ─────────────────────────────────────────────
+// Standard schema expected by @auth/prisma-adapter, plus `password` and
+// `role` for email/password credentials login.
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Orders ─────────────────────────────────────────────────────────────────
+// No payment provider yet: every order is created as PENDING and there is no
+// code path that transitions it. The enum exists because "has an order been
+// paid" is core to what an Order means, not because we're pre-building for a
+// feature that isn't here yet.
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model Order {
+  id     String      @id @default(cuid())
+  user   User        @relation(fields: [userId], references: [id])
+  userId String
+  status OrderStatus @default(PENDING)
+
+  items    OrderItem[]
+  subtotal Float
+  total    Float
+
+  // Shipping details are copied onto the order at checkout time rather than
+  // referencing a reusable Address record — an order must keep showing where
+  // it was actually sent, even if the user's profile address changes later.
+  shippingName    String
+  shippingEmail   String
+  shippingAddress String
+  shippingCity    String
+  shippingState   String
+  shippingZip     String
+  shippingCountry String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
+  // productId is optional and set null if the product is later deleted —
+  // productName/price are snapshotted here so an order's contents stay
+  // accurate even if the catalog changes or the product goes away.
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId   String?
+  productName String
+  price       Float
+  quantity    Int
+
+  createdAt DateTime @default(now())
 }

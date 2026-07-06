@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireAdminApi } from "@/lib/session";
 
 interface Params {
   params: Promise<{ id: string }>;
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
+  const guard = await requireAdminApi();
+  if (guard.response) return guard.response;
+
   const { id } = await params;
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
@@ -36,6 +40,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(_: NextRequest, { params }: Params) {
+  const guard = await requireAdminApi();
+  if (guard.response) return guard.response;
+
   const { id } = await params;
   try {
     await prisma.category.delete({ where: { id } });

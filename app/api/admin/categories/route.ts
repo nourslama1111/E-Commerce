@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireAdminApi } from "@/lib/session";
 
 export async function GET() {
+  const guard = await requireAdminApi();
+  if (guard.response) return guard.response;
+
   const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
   return NextResponse.json(categories);
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requireAdminApi();
+  if (guard.response) return guard.response;
+
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
 

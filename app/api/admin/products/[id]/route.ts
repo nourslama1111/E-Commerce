@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireAdminApi } from "@/lib/session";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const guard = await requireAdminApi();
+  if (guard.response) return guard.response;
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -35,6 +39,9 @@ export async function DELETE(
   _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const guard = await requireAdminApi();
+  if (guard.response) return guard.response;
+
   try {
     const { id } = await params;
     await prisma.product.delete({ where: { id } });
