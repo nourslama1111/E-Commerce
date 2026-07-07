@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
@@ -47,7 +46,6 @@ interface Props {
 }
 
 export default function CheckoutForm({ defaultName, defaultEmail }: Props) {
-  const router = useRouter();
   const { items, totalItems, totalPrice, clearCart } = useCart();
 
   const [form, setForm] = useState<FormState>({
@@ -98,7 +96,7 @@ export default function CheckoutForm({ defaultName, defaultEmail }: Props) {
     setSubmitting(true);
     setServerError("");
 
-    const res = await fetch("/api/orders", {
+    const res = await fetch("/api/checkout/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -109,14 +107,14 @@ export default function CheckoutForm({ defaultName, defaultEmail }: Props) {
 
     const data = await res.json().catch(() => ({}));
 
-    if (!res.ok) {
+    if (!res.ok || !data.url) {
       setServerError(data.error ?? "Something went wrong. Please try again.");
       setSubmitting(false);
       return;
     }
 
     clearCart();
-    router.push(`/order/${data.id}`);
+    window.location.href = data.url;
   };
 
   return (
@@ -237,7 +235,7 @@ export default function CheckoutForm({ defaultName, defaultEmail }: Props) {
             disabled={submitting}
             className="mt-6 w-full rounded-full bg-zinc-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            {submitting ? "Placing order…" : "Place order"}
+            {submitting ? "Redirecting to payment…" : "Place order"}
           </button>
 
           <Link

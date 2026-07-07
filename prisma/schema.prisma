@@ -110,6 +110,11 @@ model Order {
   userId String
   status OrderStatus @default(PENDING)
 
+  // Set when the order originates from a Stripe Checkout Session. Unique so
+  // the webhook (which Stripe may redeliver for the same event) can't ever
+  // create two orders for one payment.
+  stripeSessionId String? @unique
+
   items    OrderItem[]
   subtotal Float
   total    Float
