@@ -1,7 +1,19 @@
 "use client";
 
-import { createContext, useContext, useReducer, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useReducer, type ReactNode } from "react";
 import type { Product, CartItem } from "@/models/types";
+
+const CART_STORAGE_KEY = "cart";
+
+function loadInitialCart(): CartItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as CartItem[]) : [];
+  } catch {
+    return [];
+  }
+}
 
 type CartAction =
   | { type: "ADD_ITEM"; product: Product }
@@ -47,7 +59,12 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, dispatch] = useReducer(cartReducer, []);
+  const [items, dispatch] = useReducer(cartReducer, [], loadInitialCart);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
 
   const addItem = (product: Product) => dispatch({ type: "ADD_ITEM", product });
   const removeItem = (id: string) => dispatch({ type: "REMOVE_ITEM", id });
