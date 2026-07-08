@@ -128,3 +128,11 @@ export async function getOrderByStripeSessionId(stripeSessionId: string, userId:
     include: { items: true },
   });
 }
+
+export async function getOrdersByUser(userId: string) {
+  return prisma.order.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    include: { _count: { select: { items: true } } },
+  });
+}
