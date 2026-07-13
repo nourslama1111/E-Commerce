@@ -10,6 +10,7 @@ export const metadata: Metadata = { title: "Order details — ShopBase" };
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
   PAID: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
+  SHIPPED: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-400",
   CANCELLED: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400",
 };
 

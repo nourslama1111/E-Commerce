@@ -2,8 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getProductById } from "@/lib/products";
+import { getReviewsByProduct, getUserReviewForProduct } from "@/lib/reviews";
+import { getCurrentUser } from "@/lib/session";
 import { formatPrice } from "@/lib/utils";
 import AddToCartButton from "@/components/AddToCartButton";
+import ReviewForm from "@/components/ReviewForm";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -40,6 +43,9 @@ export default async function ProductDetailPage({ params }: Props) {
   const product = await getProductById(id);
 
   if (!product) notFound();
+
+  const [reviews, user] = await Promise.all([getReviewsByProduct(id), getCurrentUser()]);
+  const existingReview = user ? await getUserReviewForProduct(id, user.id) : null;
 
   const imageBg = CATEGORY_BG[product.category.name] ?? "bg-zinc-100 dark:bg-zinc-800";
 
@@ -107,6 +113,58 @@ export default async function ProductDetailPage({ params }: Props) {
             className="mt-8 w-full py-4 text-base font-semibold sm:w-72"
           />
         </div>
+      </div>
+
+      {/* Reviews */}
+      <div className="mt-16 max-w-2xl border-t border-zinc-200 pt-10 dark:border-zinc-800">
+        <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+          Reviews {reviews.length > 0 && `(${reviews.length})`}
+        </h2>
+
+        <div className="mt-6">
+          {user ? (
+            existingReview ? (
+              <p className="text-sm text-zinc-500">You&apos;ve already reviewed this product.</p>
+            ) : (
+              <ReviewForm productId={product.id} />
+            )
+          ) : (
+            <p className="text-sm text-zinc-500">
+              <Link
+                href={`/login?callbackUrl=/product/${product.id}`}
+                className="font-medium text-zinc-900 underline dark:text-white"
+              >
+                Sign in
+              </Link>{" "}
+              to leave a review.
+            </p>
+          )}
+        </div>
+
+        {reviews.length > 0 && (
+          <ul className="mt-8 divide-y divide-zinc-100 dark:divide-zinc-800">
+            {reviews.map((review) => (
+              <li key={review.id} className="py-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium text-zinc-900 dark:text-white">
+                      {review.user.name ?? "Anonymous"}
+                    </span>
+                    <StarRating rating={review.rating} />
+                  </div>
+                  <span className="text-sm text-zinc-400">
+                    {new Date(review.createdAt).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{review.comment}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </main>
   );

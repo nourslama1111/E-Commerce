@@ -136,3 +136,45 @@ export async function getOrdersByUser(userId: string) {
     include: { _count: { select: { items: true } } },
   });
 }
+
+export interface AdminOrderQuery {
+  status?: OrderStatus;
+  page?: number;
+}
+
+const ADMIN_ORDERS_PER_PAGE = 10;
+
+export async function getOrdersForAdmin(query: AdminOrderQuery = {}) {
+  const { status, page = 1 } = query;
+  const where = status ? { status } : {};
+  const skip = (page - 1) * ADMIN_ORDERS_PER_PAGE;
+
+  const [orders, total] = await prisma.$transaction([
+    prisma.order.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: ADMIN_ORDERS_PER_PAGE,
+      include: {
+        user: { select: { name: true, email: true } },
+        _count: { select: { items: true } },
+      },
+    }),
+    prisma.order.count({ where }),
+  ]);
+
+  return { orders, total, totalPages: Math.ceil(total / ADMIN_ORDERS_PER_PAGE) };
+}
+
+// Unlike getOrderById, not scoped to a userId — an admin is allowed to look
+// up any order.
+export async function getOrderByIdAdmin(id: string) {
+  return prisma.order.findUnique({
+    where: { id },
+    include: { items: true, user: { select: { name: true, email: true } } },
+  });
+}
+
+export async function updateOrderStatus(id: string, status: OrderStatus) {
+  return prisma.order.update({ where: { id }, data: { status } });
+}

@@ -26,11 +26,27 @@ model Product {
   category    Category    @relation(fields: [categoryId], references: [id])
   categoryId  String
   inStock     Boolean     @default(true)
-  rating      Float       @default(0)
-  reviewCount Int         @default(0)
   orderItems  OrderItem[]
+  // rating/reviewCount are not stored — computed from Review rows on read
+  // (see lib/products.ts) so they can never drift from what was actually
+  // submitted.
+  reviews     Review[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+
+  // One review per user per product.
+  @@unique([productId, userId])
 }
 
 enum Role {
@@ -53,6 +69,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   orders        Order[]
+  reviews       Review[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -101,6 +118,7 @@ model VerificationToken {
 enum OrderStatus {
   PENDING
   PAID
+  SHIPPED
   CANCELLED
 }
 

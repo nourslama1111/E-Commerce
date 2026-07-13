@@ -3,19 +3,21 @@ import Link from "next/link";
 interface Props {
   currentPage: number;
   totalPages: number;
-  searchParams: { search?: string; category?: string; sort?: string };
+  searchParams: Record<string, string | undefined>;
+  basePath?: string;
 }
 
 function buildUrl(
   page: number,
-  sp: { search?: string; category?: string; sort?: string }
+  sp: Record<string, string | undefined>,
+  basePath: string
 ): string {
   const params = new URLSearchParams();
-  if (sp.search)   params.set("search",   sp.search);
-  if (sp.category) params.set("category", sp.category);
-  if (sp.sort)     params.set("sort",     sp.sort);
+  for (const [key, value] of Object.entries(sp)) {
+    if (value) params.set(key, value);
+  }
   params.set("page", String(page));
-  return `/products?${params.toString()}`;
+  return `${basePath}?${params.toString()}`;
 }
 
 function getPageNumbers(current: number, total: number): (number | "ellipsis")[] {
@@ -35,7 +37,7 @@ const ACTIVE =
 const DISABLED =
   "border-zinc-100 text-zinc-300 cursor-not-allowed dark:border-zinc-800 dark:text-zinc-600";
 
-export default function Pagination({ currentPage, totalPages, searchParams }: Props) {
+export default function Pagination({ currentPage, totalPages, searchParams, basePath = "/products" }: Props) {
   if (totalPages <= 1) return null;
 
   const pages = getPageNumbers(currentPage, totalPages);
@@ -47,7 +49,7 @@ export default function Pagination({ currentPage, totalPages, searchParams }: Pr
     >
       {/* Previous */}
       {currentPage > 1 ? (
-        <Link href={buildUrl(currentPage - 1, searchParams)} className={`${BASE} ${INACTIVE}`}>
+        <Link href={buildUrl(currentPage - 1, searchParams, basePath)} className={`${BASE} ${INACTIVE}`}>
           ←
         </Link>
       ) : (
@@ -63,7 +65,7 @@ export default function Pagination({ currentPage, totalPages, searchParams }: Pr
         ) : (
           <Link
             key={p}
-            href={buildUrl(p, searchParams)}
+            href={buildUrl(p, searchParams, basePath)}
             aria-current={p === currentPage ? "page" : undefined}
             className={`${BASE} ${p === currentPage ? ACTIVE : INACTIVE}`}
           >
@@ -74,7 +76,7 @@ export default function Pagination({ currentPage, totalPages, searchParams }: Pr
 
       {/* Next */}
       {currentPage < totalPages ? (
-        <Link href={buildUrl(currentPage + 1, searchParams)} className={`${BASE} ${INACTIVE}`}>
+        <Link href={buildUrl(currentPage + 1, searchParams, basePath)} className={`${BASE} ${INACTIVE}`}>
           →
         </Link>
       ) : (

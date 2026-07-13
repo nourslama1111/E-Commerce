@@ -1,4 +1,4 @@
-// Seed data only — not used at runtime after seeding.
+﻿// Seed data only — not used at runtime after seeding.
 
 export const seedCategories = [
   { name: "Apparel",     slug: "apparel",     description: "Clothing and wearables for every occasion." },
@@ -17,8 +17,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/classic-tee/600/600",
     categoryName: "Apparel",
     inStock: true,
-    rating: 4.6,
-    reviewCount: 214,
   },
   {
     name: "Wool Sweater",
@@ -27,8 +25,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/wool-sweater/600/600",
     categoryName: "Apparel",
     inStock: true,
-    rating: 4.8,
-    reviewCount: 93,
   },
   {
     name: "Linen Shirt",
@@ -37,8 +33,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/linen-shirt/600/600",
     categoryName: "Apparel",
     inStock: false,
-    rating: 4.4,
-    reviewCount: 57,
   },
   // Accessories
   {
@@ -48,8 +42,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/leather-wallet/600/600",
     categoryName: "Accessories",
     inStock: true,
-    rating: 4.7,
-    reviewCount: 182,
   },
   {
     name: "Minimalist Watch",
@@ -58,8 +50,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/minimalist-watch/600/600",
     categoryName: "Accessories",
     inStock: true,
-    rating: 4.9,
-    reviewCount: 310,
   },
   {
     name: "Polarized Sunglasses",
@@ -68,8 +58,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/polarized-sunglasses/600/600",
     categoryName: "Accessories",
     inStock: true,
-    rating: 4.3,
-    reviewCount: 67,
   },
   // Bags
   {
@@ -79,8 +67,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/canvas-tote/600/600",
     categoryName: "Bags",
     inStock: false,
-    rating: 4.5,
-    reviewCount: 128,
   },
   {
     name: "Leather Backpack",
@@ -89,8 +75,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/leather-backpack/600/600",
     categoryName: "Bags",
     inStock: true,
-    rating: 4.8,
-    reviewCount: 76,
   },
   {
     name: "Waxed Duffel",
@@ -99,8 +83,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/waxed-duffel/600/600",
     categoryName: "Bags",
     inStock: true,
-    rating: 4.6,
-    reviewCount: 44,
   },
   // Home
   {
@@ -110,8 +92,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/ceramic-mug/600/600",
     categoryName: "Home",
     inStock: true,
-    rating: 4.7,
-    reviewCount: 203,
   },
   {
     name: "Merino Throw",
@@ -120,8 +100,6 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/merino-throw/600/600",
     categoryName: "Home",
     inStock: true,
-    rating: 4.9,
-    reviewCount: 88,
   },
   {
     name: "Soy Candle Set",
@@ -130,7 +108,5 @@ export const seedProducts = [
     image: "https://picsum.photos/seed/soy-candle-set/600/600",
     categoryName: "Home",
     inStock: false,
-    rating: 4.5,
-    reviewCount: 156,
   },
 ];

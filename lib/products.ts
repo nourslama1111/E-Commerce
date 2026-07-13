@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import type { Product } from "@/models/types";
+import { getRatingSummaries, getRatingSummary, summaryFor, type RatingSummary } from "./reviews";
 
 export interface ProductQuery {
   category?: string; // category slug
@@ -25,11 +26,9 @@ type PrismaProductWithCategory = {
   categoryId: string;
   category: { id: string; name: string; slug: string; description: string };
   inStock: boolean;
-  rating: number;
-  reviewCount: number;
 };
 
-function serialize(doc: PrismaProductWithCategory): Product {
+function serialize(doc: PrismaProductWithCategory, summary: RatingSummary): Product {
   return {
     id: doc.id,
     name: doc.name,
@@ -44,8 +43,8 @@ function serialize(doc: PrismaProductWithCategory): Product {
       description: doc.category.description,
     },
     inStock: doc.inStock,
-    rating: doc.rating,
-    reviewCount: doc.reviewCount,
+    rating: summary.rating,
+    reviewCount: summary.reviewCount,
   };
 }
 
@@ -79,8 +78,10 @@ export async function getProducts(query: ProductQuery = {}): Promise<ProductsRes
     prisma.product.count({ where }),
   ]);
 
+  const summaries = await getRatingSummaries(docs.map((d) => d.id));
+
   return {
-    products: docs.map(serialize),
+    products: docs.map((doc) => serialize(doc, summaryFor(summaries, doc.id))),
     total,
     totalPages: Math.ceil(total / PER_PAGE),
   };
@@ -91,7 +92,10 @@ export async function getProductById(id: string): Promise<Product | null> {
     where: { id },
     include: { category: true },
   });
-  return doc ? serialize(doc) : null;
+  if (!doc) return null;
+
+  const summary = await getRatingSummary(id);
+  return serialize(doc, summary);
 }
 
 export async function getFeaturedProducts(count = 3): Promise<Product[]> {
@@ -101,5 +105,7 @@ export async function getFeaturedProducts(count = 3): Promise<Product[]> {
     orderBy: { createdAt: "desc" },
     include: { category: true },
   });
-  return docs.map(serialize);
+
+  const summaries = await getRatingSummaries(docs.map((d) => d.id));
+  return docs.map((doc) => serialize(doc, summaryFor(summaries, doc.id)));
 }
